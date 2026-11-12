@@ -43,3 +43,10 @@ def summary(expenses: list[Expense]) -> str:
         return "No expenses."
     days = sorted(e.day for e in expenses)
     return f"{len(expenses)} expenses from {days[0].isoformat()} to {days[-1].isoformat()}"
+
+
+def totals_by_currency(expenses: list[Expense]) -> dict[str, Decimal]:
+    totals: dict[str, Decimal] = {}
+    for e in expenses:
+        totals[e.currency] = totals.get(e.currency, Decimal(0)) + e.amount
+    return dict(sorted(totals.items()))
