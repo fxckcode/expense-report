@@ -43,3 +43,23 @@ def summary(expenses: list[Expense]) -> str:
         return "No expenses."
     days = sorted(e.day for e in expenses)
     return f"{len(expenses)} expenses from {days[0].isoformat()} to {days[-1].isoformat()}"
+
+
+def monthly_totals(expenses: list[Expense]) -> dict[str, dict[str, Decimal]]:
+    totals: dict[str, dict[str, Decimal]] = {}
+    for e in expenses:
+        month = f"{e.day.year:04d}-{e.day.month:02d}"
+        by_currency = totals.setdefault(month, {})
+        by_currency[e.currency] = by_currency.get(e.currency, Decimal(0)) + e.amount
+    return totals
+
+
+def monthly_report(expenses: list[Expense]) -> str:
+    if not expenses:
+        return "No expenses."
+    totals = monthly_totals(expenses)
+    blocks = []
+    for month in sorted(totals):
+        lines = [f"  {cur} {totals[month][cur]}" for cur in sorted(totals[month])]
+        blocks.append("\n".join([month, *lines]))
+    return "\n\n".join(blocks)
